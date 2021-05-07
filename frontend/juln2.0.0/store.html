@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./pictures/logo.png" type="image/x-icon">
+    <title>蜜蜂寻址-商铺信息</title>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+    <link rel="stylesheet" href="./css/store.css">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        li{
+            list-style-type: none;
+        }
+        body{
+            width: 100vw;
+            overflow-x: hidden;
+        }
+
+        #app{
+            margin: auto;
+            width: 85vw;
+        }
+
+        /* 顶部栏 */
+        .top{
+            position: relative;
+            margin: auto;
+            height: 50px;
+            background: white;
+        }
+        .top>.logo{
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: rgb(255,61,1);
+        }
+        .top>.mobile-logo{
+            display: none;
+        }
+        .top>nav{
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            width: 250px;
+            height: 50px;
+            line-height: 50px;
+        }
+        .top>nav>li{
+            cursor: pointer;
+        }
+        .top>nav>li:hover{
+            color: red;
+        }
+
+        /* 广告栏 */
+        .adv-box{
+            display: flex;
+            justify-content: center;
+            height: calc(90vw / 1920 * 900);
+            background: url(./pictures/adv-bg.jpg);
+            background-size: 100% 100%;
+        }
+        .adv-box>.inner-box{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 60%;
+            height: 70%;
+            background: rgba(7,50,60,.5);
+        }
+        .adv-box .logo{
+            font-size: 3.5vw;
+            line-height: 5vw;
+            height: 5vw;
+            color: rgb(255,224,71);
+        }
+        .adv-box .title{
+            font-size: 3vw;
+            line-height: 5vw;
+            height: 5vw;
+            color: white;
+        }
+        .adv-box .title2{
+            font-size: 2.2vw;
+            line-height: 5vw;
+            height: 5vw;
+            color: rgb(200,200,200);
+        }
+
+        /* 位置信息 */
+        .pos-box{
+            display: flex;
+            flex-direction: column;
+            padding: 15px 0;
+            background: rgb(245,245,245);
+        }
+
+        /* 当前位置 */
+        .pos-box .current-pos{
+            margin: auto;
+            display: flex;
+            width: 270px;
+            height: 50px;
+            background: rgb(237,237,237);
+            border-radius: 25px;
+        }
+        .pos-box .current-pos>img{
+            margin-top: 10px;
+            margin-left: 10px;
+            width: 30px;
+            height: 30px;
+        }
+        .pos-box .current-pos>p{
+            width: 120%;
+            height: 100%;
+            line-height: 50px;
+            font-size: 17px;
+            text-align: center;
+        }
+
+        /* 定位信息的三行标题 */
+        .pos-box .title1{
+            margin: auto;
+            width: 100%;
+            height: 40px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 40px;
+        }
+        .pos-box .title2{
+            margin: auto;
+            width: 100%;
+            height: 20px;
+            font-size: 14px;
+            color: rgb(180,180,180);
+            text-align: center;
+            line-height: 15px;
+        }
+        .pos-box .title3{
+            margin: auto;
+            width: 100%;
+            font-size: 16px;
+            color: rgb(100,100,100);
+            text-align: center;
+            line-height: 20px;
+        }
+
+        /* 定位信息的banner */
+        .mobile-outer-banner{
+            margin: auto;
+            width: 200px;
+            overflow-x: scroll;
+        }
+        .banner{
+            padding-top: 25px;
+            display: flex;
+
+            justify-content: space-around;
+        }
+        .mobile-banner{
+            justify-content: none !important;
+
+            width: 650px;
+        }
+        .banner li{
+            width: 200px;
+        }
+        .banner img{
+            margin: auto;
+            display: block;
+            width: 130px;
+            height: 130px;
+            border: 2px solid red;
+            border-radius: 50%;
+        }
+        .banner li>.title{
+            height: 30px;
+            line-height: 45px;
+            text-align: center;
+        }
+        .banner li>p:nth-of-type(2) {
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+        }
+        .banner .details>.detail{
+            text-align: center;
+            font-size: 12px;
+            color: rgb(100,100,100);
+        }
+        .banner .lng-lat .lng, .banner .lng-lat .lat{
+            text-align: center;
+            font-size: 12px;
+            color: red;
+        }
+
+        /* 定位信息最底下的button按钮 */
+        .read-more-btn{
+            margin: auto;
+            margin-top: 20px;
+            width: 150px;
+            height: 30px;
+            border: 2px solid red;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        .read-more-btn:hover{
+            opacity: .7;
+        }
+
+        /* 数据分析 */
+        .analysis-box{
+            
+        }
+        .analysis-box>.title-box{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        .analysis-box .title1{
+            font-size: 16px;
+            font-weight: normal;
+        }
+        .analysis-box .title2{
+            font-size: 12px;
+            font-weight: normal;
+            color: rgb(180,180,180);
+        }
+
+        /* PC端echarts-box */
+        .echarts-box{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+        }
+        #echarts1{
+            width: 400px;
+            height: 270px;
+        }
+        #echarts2{
+            width: 300px;
+            height: 300px;
+        }
+        #echarts3{
+            width: 300px;
+            height: 350px;
+        }
+
+        /* mobile端echarts-box */
+        .mobile-echarts-box{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .mobile-echarts1{
+            transform: scale(.75);
+        }
+        .mobile-echarts2{
+            transform: scale(.75);
+        }
+        .mobile-echarts3{
+            transform: scale(.75);
+        }
+
+        /* 店铺详细信息 */
+        .details-box{
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            height: 230px;
+            background: linear-gradient(rgb(7,2,5),rgb(227,79,187),rgb(14,248,233));
+            color: rgb(245,200,41);
+        }
+        .mobile-details-box{
+            height: 450px;
+            flex-direction: column;
+        }
+        .details-box img{
+            margin-left: 10px;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            transform: translateY(10px);
+        }
+        .details-box>ul>li>p{
+            margin-left: 5px;
+            display: inline-block;
+        }
+        .details-box .store-cover{
+            width: 250px;
+            height: 180px;
+        }
+        .details-box .mobile-store-cover{
+            transform: translateY(-10px);
+        }
+
+        /* footer */
+        footer{
+            width: 100%;
+            color: rgb(180,180,180);
+            font-size: 14px;
+            background: rgb(34,34,34);
+        }
+        footer>*{
+            background: rgb(34,34,34) !important;
+        }
+        footer>.top{
+            padding: 0 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 240px;
+        }
+        footer>.top>ul>li{
+            width: 80px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        footer>.top>ul>li:hover{
+            color: rgb(255,61,1);
+        }
+        .QR-code-box{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 130px;
+            height: 180px;
+        }
+        .QR-code-box>span{
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+        }
+        .QR-code-box>img{
+            width: 130px;
+            height: 130px;
+        }
+        footer>.bottom1{
+            height: 50px;
+            border-top: 1px solid black;
+            text-align: center;
+            line-height: 50px;
+            color: rgb(100,100,100);
+        }
+        footer>.bottom2{
+            height: 50px;
+            border-top: 1px solid black;
+            text-align: center;
+            line-height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        
+        <div class="top">
+            <div 
+                :class="{logo: true,'mobile-logo': cssData.windowWidth <= 500}"
+            >MFXZ</div>
+            <nav>
+                <li v-for='(item,i) in htmlData.topNavList' :key="i">{{item}}</li>
+            </nav>
+        </div>
+
+        <div class="adv-box">
+            <div class="inner-box">
+                <p class="logo">MFXZ</p>
+                <p class="title">专业定位寻址整体方案提供</p>
+                <p class="title2">Professional Orientation</p>
+            </div>
+        </div>
+
+        <div class="pos-box">
+
+            <div class="current-pos">
+                <img src="./pictures/location.png" alt="">
+                <p v-if='storeInfo'>{{storeInfo.store.storeAddress}}</p>
+            </div>
+
+            <div class="title-box">
+                <h2 class="title1">定位信息</h3>
+                <p class="title2">l o c a t e &nbsp;&nbsp; i n f o r m a t i o n</p>
+                <p class="title3">一 键 式 查 询 具 体 地 理 位 置 信 息 及 周 边 详 情</p>
+            </div>
+
+            <div :class="{'mobile-outer-banner': cssData.windowWidth <= 650}">
+                <ul 
+                    :class="{banner: true, 'mobile-banner': cssData.windowWidth <= 650}"
+                >
+                    <li v-for='item in htmlData.banner' :key="item.id">
+                        <img :src="item.imgSrc" alt="">
+                        <p class="title">{{item.title}}</p>
+                        <p>------</p>
+                        <div class="details">
+                            <p 
+                                class="detail"
+                                v-for='(detail,i) in item.details'
+                                :key="i"
+                            >{{detail}}</p>
+                        </div>
+                        <div 
+                            class="lng-lat" 
+                            v-if='item.id === 1 &&  storeInfo !== null'
+                        >
+                            <p class="lng">经度: {{storeInfo.store.location.split(',')[0]}}</p>
+                            <p class="lat">经度: {{storeInfo.store.location.split(',')[1]}}</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <button class="read-more-btn">READ MORE</button>
+
+        </div>
+
+        <div class="analysis-box">
+
+            <div class="title-box">
+                <h2 class="title1">数据分析</h2>
+                <p class="title2">D &nbsp;a &nbsp; t &nbsp; a &nbsp; &nbsp; &nbsp; a &nbsp; n &nbsp; a &nbsp; l &nbsp; y &nbsp; s &nbsp; i &nbsp; s</p>
+            </div>
+
+            <div :class="{'echarts-box': true, 'mobile-echarts-box': cssData.windowWidth <= 650}">
+                <!-- 曲线图 (五个分数) -->
+                <div id="echarts1" :class="{'mobile-echarts1': cssData.windowWidth <= 650}"></div>
+                
+                <!-- 饼图 (互补业态) -->
+                <div id="echarts2" :class="{'mobile-echarts2': cssData.windowWidth <= 650}"></div>
+
+                <!-- 雷达图, 不知道做什么 -->
+                <div id="echarts3" :class="{'mobile-echarts3': cssData.windowWidth <= 650}"></div>
+
+                <!-- 雷达图示例 -->
+                <div id="echarts4"></div>
+            </div>
+        </div>
+
+        <div
+            v-if='storeInfo'
+            :class="{'details-box': true, 'mobile-details-box': cssData.windowWidth <= 650}"
+        >
+            <ul>
+                <li class="current-pos">
+                    <img src="./pictures/zhoubian.png" alt="">
+                    <p>{{storeInfo.store.storeAddress}}</p>
+                </li>
+    
+                <li class="area">
+                    <img src="./pictures/kongjianmianji-.png" alt="">
+                    <p>{{storeInfo.store.storeArea}} {{storeInfo.store.areaType}}</p>
+                </li>
+
+                <li class="rent">
+                    <img src="./pictures/yuezujin.png" alt="">
+                    <p>{{storeInfo.store.storeRent}} {{storeInfo.store.rentType}}</p>
+                </li>
+
+                <li class="name">
+                    <img src="./pictures/dianchang.png" alt="">
+                    <p>{{storeInfo.store.publisherName}}</p>
+                </li>
+
+                <li class="state">
+                    <img src="./pictures/dianpuzhuangtai.png" alt="">
+                    <p>{{storeInfo.store.rentState}}</p>
+                </li>
+            </ul>
+
+            <img
+                v-if='storeInfo'
+                :class="{'store-cover': true, 'mobile-store-cover': cssData.windowWidth <= 650}" 
+                :src="storeInfo.store.storeImg" alt=""
+            >
+        </div>
+
+    </div>
+
+    <footer id="footer" v-show='cssData.windowWidth > 650'>
+        <div class="top">
+            <ul v-for='col in htmlData.footer' :key="col.id">
+                <li>{{col.top}}</li>
+                <br>
+                <li v-for='item in col.items'>{{item}}</li>
+            </ul>
+    
+            <div class="QR-code-box">
+                <span>关注我们</span>
+                <img src="./pictures/QRcode.png" alt="">
+            </div>    
+        </div>
+
+        <div class="bottom1">24小时服务热线: 00000000000 Mail: 000000@gmail.com</div>
+        <div class="bottom2">@ &nbsp; 2 0 2 0 &nbsp; M F X Z &nbsp; A L L &nbsp; R I G H T S &nbsp; R E S E R V E D</div>
+    </footer>
+    
+    <script src="./js/store.js"></script>
+</body>
+</html>

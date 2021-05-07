@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<meta name="format-detection"content="telephone=no">
+<title>仿照运动APP的轨迹记录功能定位</title>
+<link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+    <div id="container"></div>
+    <div id="info"></div>
+    <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
+ <!--   <script src="http://map.qq.com/api/js?v=2.exp" type="text/javascript"></script> -->
+    <script>
+          var clientWidth = document.documentElement.clientWidth,
+              clientHeight = document.documentElement.clientHeight;//获取页面可见域宽和高
+          var container = document.getElementById('container');
+          container.style.width = clientWidth + 'px';//将可见域宽高赋值给要显示地图的div
+          container.style.height = clientHeight + 'px';
+          	var longitude=0;//起点经纬
+	        var latitude=0;
+		
+			/*var run=0;*/
+		/*	var far_Away=0;*/
+		
+          function getLocation(){//页面装载第一个自动调用的函数
+
+             var options={
+                 enableHighAccuracy:true, //boolean 是否要求高精度的地理信息，默认为false，我们要改为true
+                 maximumAge:1000 //应用程序的缓存时间
+             }
+
+             if(navigator.geolocation){
+                 //浏览器支持geolocation
+                 navigator.geolocation.getCurrentPosition(onSuccess,onError,options);
+                 
+             }else{
+                 //浏览器不支持geolocation
+                 console.log("浏览器不支持!");
+             }
+          }
+          //成功时
+          function onSuccess(position){ //返回用户位置  
+              //经度
+	          longitude =position.coords.longitude;
+              //纬度
+               latitude = position.coords.latitude;
+			
+              //腾讯地图的中心地理坐标,起点start
+              var center = new qq.maps.LatLng( latitude,longitude);
+			  //终点设置end
+	          var center2=new qq.maps.LatLng(latitude +0.018,longitude+0.010);
+              //使用腾讯地图API
+              var map = new qq.maps.Map(document.getElementById("container"), {
+                //地图的中心地理坐标
+                center: center,
+                //初始化地图缩放级别
+                zoom: 14
+				
+              });
+             
+              //在地图中创建信息提示窗口
+              var infoWin = new qq.maps.InfoWindow({
+                  map: map
+              });
+              //打开信息窗口
+            /* infoWin.open();
+              //设置信息窗口显示区的内容
+              infoWin.setContent('<div style="width:200px;padding:10px;">'+
+                  '您在这里<br/>纬度：'+  latitude+  '<br/>经度：'+longitude);
+              //设置信息窗口的位置
+              infoWin.setPosition(center);*/
+			  
+			  //创建动画点起点
+		setTimeout(function(){
+            var marker=new qq.maps.Marker({
+            position:center,
+			animation:qq.maps.MarkerAnimation.DROP,
+            map:map
+        });
+        //marker.setAnimation(qq.maps.Animation.DROP);
+    },0);
+	    //创建动画点终点，为原点分别偏移0.018和0.010
+		setTimeout(function(){
+            var marker=new qq.maps.Marker({
+            position:new qq.maps.LatLng(latitude+0.018,longitude+0.010),
+			animation:qq.maps.MarkerAnimation.DROP,
+            map:map
+        });
+        //marker.setAnimation(qq.maps.Animation.DROP);
+    },2000);//2秒后掉落效果
+	
+          //创建路线(直线线段)
+		  /* var path = [
+            new qq.maps.LatLng(latitude,longitude),
+            new qq.maps.LatLng(latitude+0.018,longitude+0.010)
+            new qq.maps.LatLng(latitude, 116.420)*/
+    /*    ];
+        var polygon = new qq.maps.Polyline({
+            map: map,
+            path: path,
+            editable: true
+        });*/
+		
+      //设置获取线路方案的服务（获取线路，这个真的写死我了= =）
+	var drivingService = new qq.maps.DrivingService({
+		map: map,
+		//展现结果在第二个div上
+		panel: document.getElementById('info')//info为div的id
+	});
+	//设置回调函数
+	drivingService.setComplete(function(result) {
+		if (result.type == qq.maps.ServiceResultType.MULTI_DESTINATION) {
+			alert("起终点不唯一");
+		}
+	});
+	//设置检索失败回调函数
+	drivingService.setError(function(data) {
+		alert(data);
+	});    
+	drivingService.search(center, center2);//start,end分别是起点的latLng坐标和终点的latLng坐标
+	/*	search();  */
+		  }
+/*function search() {
+      drivingService.setPolicy(qq.maps.DrivingPolicy[policy]);
+    //设置驾驶路线的起点和终点
+    drivingService.search(center, center2);
+}*/
+          //失败时
+          function onError(error){
+             switch(error.code){
+                 case error.PERMISSION_DENIED:
+                 alert("用户拒绝对获取地理位置的请求");
+                 break;
+
+                 case error.POSITION_UNAVAILABLE:
+                 alert("位置信息是不可用的");
+                 break;
+
+                 case error.TIMEOUT:
+                 alert("请求用户地理位置超时");
+                 break;
+
+                 case error.UNKNOWN_ERROR:
+                  alert("未知错误");
+                 break;
+             }
+
+          }
+
+          window.onload=getLocation;
+   </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蜜蜂寻址-登录</title>
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+<body>
+    <div class="box">
+
+        <div class="QR-code">
+            <img src="./pictures/QRcode.png" alt="">
+            <div class="shadow"></div>
+        </div>
+
+        <div class="inner-box">
+
+            <nav>
+                <li class="active">密码登录</li>
+                <li>短信登录</li>
+            </nav>
+    
+            <form action="/api/{source}/User/SignIn" method="POST">
+                <table>
+                    <tr>
+                        <td><input type="text" name="PhoneNo" placeholder="手机号/账号"/></td>
+                    </tr>
+                    <tr>
+                        <td><input type="password" name="PassWord" placeholder="密码"/></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit"><a href="./core.html">登录</a></button></td>
+                    </tr>
+                </table>
+            </form>
+    
+            <label class="remember-password"><input type="checkbox" name="">下次自动登录</label>
+            <a class="forget" href="">忘记密码</a>
+            <a class="register" href="">注册</a>
+    
+            <div class="other-login">
+                <p>第三方账号登录</p>
+                <ul class="logos">
+                    <li><img class="qq-logo" src="./pictures/QQ.png" alt=""></li>
+                    <li><img class="wx-logo" src="./pictures/weixin.png" alt=""></li>
+                    <li><img class="xinlang-logo" src="./pictures/xinlang.png" alt=""></li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>
